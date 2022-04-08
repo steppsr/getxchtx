@@ -18,3 +18,15 @@ INPUT PARAMETERS: Transaction ID, Counter (optional)<br>
 OUTPUT: transaction data appended to 'transaction.csv' and to screen.
 
 **Note:** Each transaction takes about 1 second to process, so it may take quite a while to finish creating the file.
+
+***python3*** must be installed. Run the following command to see if you have it installed.
+
+```
+python3 --version
+```
+
+***xargs*** must be install. Run the following command to see if you have it installed.
+
+```
+xargs --version
+```
