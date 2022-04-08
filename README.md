@@ -17,7 +17,7 @@ sh taxtran.sh
 INPUT PARAMETERS: Transaction ID, Counter (optional)<br>
 OUTPUT: transaction data appended to 'transaction.csv' and to screen.
 
-**Notes** 
+**Notes**<br>
 **1** Each transaction takes about 1 second to process, so it may take quite a while to finish creating the file.<br>
 **2** You will need to modify the "path" at the top of each script to be the location you place these files. I suggest creating a directory under home and running from within that directory.
 
