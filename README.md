@@ -12,7 +12,7 @@ OUTPUT: CSV File named 'transactions.csv'
 sh taxtran.sh
 ```
 
-**chiatx.sh** - this script will accept a transaction id as input, then run a Chia Wallet command to get the details of the transaction. The details are parsed and formatted then printed to a CSV file, and also to the screen. The screen output also includes a countdown counter on each line.
+**chiatx.sh** - this script will accept a transaction id as input, then run a Chia Wallet command to get the details of the transaction. The details are parsed and formatted then printed to a CSV file, and also to the screen. The screen output also includes a countdown counter on each line. *This script is called from taxtran.sh*
 
 INPUT PARAMETERS: Transaction ID, Counter (optional)<br>
 OUTPUT: transaction data appended to 'transaction.csv' and to screen.
