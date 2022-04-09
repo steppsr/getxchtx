@@ -1,10 +1,15 @@
 #!/bin/bash
 
 path=~/sourcecode/taxtran
+<<<<<<< HEAD
 binpath=~/chia-blockchain/venv/bin
 
 # Parameter 1 is required. Chia transaction ID. Exit if the paramater is empty
 # Parameter 2 is optional. Countdown value is printed on screen before the transaction detail.
+=======
+
+# Expects one paramater - Chia transaction ID. Exit if the paramater is empty
+>>>>>>> Initial commit
 id=$1
 cnt=$2
 
@@ -13,10 +18,26 @@ if [ -z "$id" ]; then
 	exit 1
 fi
 
+<<<<<<< HEAD
 json=`$binpath/chia wallet get_transaction -v -tx $id`
 
 # Fields to put into CSV file
 # DateTime    Name    Transaction Amount    Current Price    Transaction Type
+=======
+# start python virtual environment for Chia
+cd ~/chia-blockchain
+. ./activate
+
+json=`chia wallet get_transaction -v -tx $id`
+
+#
+# Fields to put into CSV file
+#
+# DateTime    Name    Transaction Amount    Current Price    Transaction Type
+# $transday   $name   $xch                  $curusd          $typedesc
+#
+
+>>>>>>> Initial commit
 name=$(echo "$json" | grep "name" | cut --fields 4 --delimiter=\' )
 mojo=$(echo "$json" | grep " 'amount" | grep -v "additions" | grep -v "fee_amount" | cut --fields 2 --delimiter=: | xargs)
 mojo=${mojo%?}
@@ -51,7 +72,11 @@ esac
 
 # Get the date
 
+<<<<<<< HEAD
 # Use this section if running this script on each new transaction as it comes in.
+=======
+# Use this sectoin if running this script on each new transaction as it comes in.
+>>>>>>> Initial commit
 #today=$(date +"%Y-%m-%d %T")
 #transday=$(date --date=@$created_at_time +"%Y-%m-%d %T")
 
@@ -94,3 +119,9 @@ curusd=0
 csv="transactions.csv"
 echo "\"$transday\",\"$name\",$xch,$curusd,\"$typedesc\""  >>$path/$csv
 echo "$cnt: \"$transday\",\"$name\",$xch,$curusd,\"$typedesc\""
+<<<<<<< HEAD
+=======
+
+# stop python virtual environment for Chia
+deactivate
+>>>>>>> Initial commit
