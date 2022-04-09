@@ -18,9 +18,9 @@ COMMAND OPTIONS<br>
 Usage: sh taxtran.sh [options]
 
 options
-  -y        4-digit year for transactions
-  -d        directory to store output file
-  -f        output filename
+  -y        4-digit year for transactions     default = all
+  -d        directory to store output file    default = present working directory
+  -f        output filename                   default = transactions.csv
 
 Example:  sh taxtran.sh -y 2021 -d ~/mytaxes -f transactions.csv
 ```
