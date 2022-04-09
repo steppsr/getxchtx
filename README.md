@@ -35,7 +35,7 @@ OUTPUT: transaction data appended to 'transaction.csv' and to screen.
 ---
 
 **Notes**<br>
-**1.** Since this is pulling historical transactions, the current price column is set to 0. You will need to populate that column manually.<br>*Let me know if there is a free API that can pull historical pricing for XCH.*<br>
+**1.** Since this is pulling historical transactions, the current price column is set to 0. You will need to populate that column manually. *Let me know if there is a free API that can pull historical pricing for XCH.*<br>
 **2.** Each transaction takes about 1 second to process, so it may take quite a while to finish creating the file.<br>
 **3.** ***python3*** must be installed. Run the following command to see if you have it installed.
 
