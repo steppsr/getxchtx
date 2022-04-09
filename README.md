@@ -17,4 +17,17 @@ sh taxtran.sh
 INPUT PARAMETERS: Transaction ID, Counter (optional)<br>
 OUTPUT: transaction data appended to 'transaction.csv' and to screen.
 
-**Note:** Each transaction takes about 1 second to process, so it may take quite a while to finish creating the file.
+**Notes**<br>
+**1.** Since this is pulling historical transactions, the current price column is set to 0. You will need to populate that column manually.<br>*Let me know if there is a free API that can pull historical pricing for XCH.*<br>
+**2.** Each transaction takes about 1 second to process, so it may take quite a while to finish creating the file.<br>
+**3.** You will need to modify the "path" at the top of each script to be the location you place these files. I suggest creating a directory under home and running from within that directory.<br>
+**4.** ***python3*** must be installed. Run the following command to see if you have it installed.
+
+```
+python3 --version
+```
+**5.** ***xargs*** must be install. Run the following command to see if you have it installed.
+
+```
+xargs --version
+```
