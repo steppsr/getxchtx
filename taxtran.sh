@@ -42,7 +42,10 @@ curl -s -X POST --insecure --cert ~/.chia/mainnet/config/ssl/wallet/private_wall
 
 cnt=`cat $dir/trans_id_list.txt | wc -l`
 
+# Write a header to the output file
+echo "DateTime,Name,Amount,CurrentPrice,Type" >$path
+
 while read t; do
-  $dir/chiatx.sh $t $path $year $cnt
+  bash $dir/chiatx.sh $t $path $year $cnt
   cnt=$((cnt-1))
 done <$dir/trans_id_list.txt
