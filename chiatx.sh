@@ -1,43 +1,30 @@
 #!/bin/bash
 
-path=~/sourcecode/taxtran
-<<<<<<< HEAD
 binpath=~/chia-blockchain/venv/bin
 
-# Parameter 1 is required. Chia transaction ID. Exit if the paramater is empty
-# Parameter 2 is optional. Countdown value is printed on screen before the transaction detail.
-=======
+# Parameter 1 is required. Chia transaction ID. Exit if the paramater is empty.
+# Parameter 2 is required. Path and Filename to use for the output file.
+# Parameter 3 is required. The year for the selection of transaction. "all" is all transactions.
+# Parameter 4 is optional. Countdown value is printed on screen before the transaction detail.
 
-# Expects one paramater - Chia transaction ID. Exit if the paramater is empty
->>>>>>> Initial commit
 id=$1
-cnt=$2
+filepath=$2
+year=$3
+cnt=$4
 
 if [ -z "$id" ]; then
-	echo "Transaction ID is missing"
-	exit 1
+    echo "Transaction ID is missing."
+    exit 1
+fi
+if [ -z "$filepath" ]; then
+    echo "Path and filename are missing."
+    exit 1
 fi
 
-<<<<<<< HEAD
 json=`$binpath/chia wallet get_transaction -v -tx $id`
 
 # Fields to put into CSV file
 # DateTime    Name    Transaction Amount    Current Price    Transaction Type
-=======
-# start python virtual environment for Chia
-cd ~/chia-blockchain
-. ./activate
-
-json=`chia wallet get_transaction -v -tx $id`
-
-#
-# Fields to put into CSV file
-#
-# DateTime    Name    Transaction Amount    Current Price    Transaction Type
-# $transday   $name   $xch                  $curusd          $typedesc
-#
-
->>>>>>> Initial commit
 name=$(echo "$json" | grep "name" | cut --fields 4 --delimiter=\' )
 mojo=$(echo "$json" | grep " 'amount" | grep -v "additions" | grep -v "fee_amount" | cut --fields 2 --delimiter=: | xargs)
 mojo=${mojo%?}
@@ -72,11 +59,7 @@ esac
 
 # Get the date
 
-<<<<<<< HEAD
 # Use this section if running this script on each new transaction as it comes in.
-=======
-# Use this sectoin if running this script on each new transaction as it comes in.
->>>>>>> Initial commit
 #today=$(date +"%Y-%m-%d %T")
 #transday=$(date --date=@$created_at_time +"%Y-%m-%d %T")
 
@@ -84,6 +67,7 @@ esac
 transday=$(echo "$json" | grep "created_at_time" | cut --fields 2 --delimiter=: | xargs)
 transday=${transday%?}
 transday=$(date -d @"$transday" +"%F %r")
+transyear=`echo $transday | cut -c1-4`
 
 # cant do floating division in Bash but we know xch is always mojo/10000000000 so we can use string manipulation to build the xch value from mojo
 mojolength=`expr length $mojo`
@@ -116,12 +100,13 @@ fi
 # Since we are pulling historical transactions, we shouldn't use the current price. 
 curusd=0
 
-csv="transactions.csv"
-echo "\"$transday\",\"$name\",$xch,$curusd,\"$typedesc\""  >>$path/$csv
-echo "$cnt: \"$transday\",\"$name\",$xch,$curusd,\"$typedesc\""
-<<<<<<< HEAD
-=======
-
-# stop python virtual environment for Chia
-deactivate
->>>>>>> Initial commit
+if [ "$year" == "all" ]; then
+  # any year
+  echo "\"$transday\",\"$name\",$xch,$curusd,\"$typedesc\""  >>$filepath
+  echo "$cnt: \"$transday\",\"$name\",$xch,$curusd,\"$typedesc\""
+elif [ "$year" == "$transyear" ]; then
+  echo "\"$transday\",\"$name\",$xch,$curusd,\"$typedesc\""  >>$filepath
+  echo "$cnt: \"$transday\",\"$name\",$xch,$curusd,\"$typedesc\""
+else
+  echo "$cnt: Year is $transyear - skipping..."
+fi
