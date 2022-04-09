@@ -42,7 +42,7 @@ OUTPUT: transaction data appended to 'transaction.csv' and to screen.
 ```
 python3 --version
 ```
-**5.** ***xargs*** must be install. Run the following command to see if you have it installed.
+**4.** ***xargs*** must be install. Run the following command to see if you have it installed.
 
 ```
 xargs --version
