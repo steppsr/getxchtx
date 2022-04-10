@@ -66,9 +66,9 @@ curl -s -X POST --insecure \
 
 # Write out a header row
 if [ "$verbose" == 1 ]; then
-	header="tx_name,tx_datetime,tx_type,tx_amount,tx_additions,tx_confirmed,tx_confirmed_at_height,tx_fee_amount,tx_memos,tx_removals,tx_sent,tx_sent_to,tx_spend_bundle,tx_to_address,tx_to_puzzle_hash,tx_trade_id,tx_wallet_id"
+	header="tx_name,tx_datetime,tx_type,tx_amount,current_price,tx_additions,tx_confirmed,tx_confirmed_at_height,tx_fee_amount,tx_memos,tx_removals,tx_sent,tx_sent_to,tx_spend_bundle,tx_to_address,tx_to_puzzle_hash,tx_trade_id,tx_wallet_id"
 else
-	header="tx_name,tx_datetime,tx_type,tx_amount"
+	header="tx_name,tx_datetime,tx_type,tx_amount,current_price"
 fi
 echo "$header"
 
@@ -94,9 +94,12 @@ jq -c '.transactions[]' alltxs.json | while read trx; do
     tx_trade_id=`echo "$trx" | jq -r '.trade_id'`
     tx_type=`echo "$trx" | jq -r '.type'`
     tx_wallet_id=`echo "$trx" | jq -r '.wallet_id'`
-
+	
+	# placeholder for the current price of XCH
+	current_price=0
+	
     # call function to switch amount from mojo to xch
-    mojo2xch & tx_amount=$xch
+    mojo2xch && tx_amount=$xch
 
 	# build datetime from epoch
 	tx_datetime=$(date --date=@$tx_created_at_time +"%Y-%m-%d %T")
@@ -130,7 +133,7 @@ jq -c '.transactions[]' alltxs.json | while read trx; do
 		tx_amount="$newamount"
 		
 		# call function to switch from mojo to xch
-		mojo2xch & tx_amount=$xch
+		mojo2xch && tx_amount=$xch
 	fi
 		
 	# If year is passed in as an option we only want to print that year
@@ -139,9 +142,9 @@ jq -c '.transactions[]' alltxs.json | while read trx; do
 		# write out to screen
 		# to save to file the user must use redirection on the command line
 		if [ "$verbose" == 1 ]; then
-			row="$tx_name,$tx_datetime,$tx_typedesc,$tx_amount,$tx_additions,$tx_confirmed,$tx_confirmed_at_height,$tx_fee_amount,$tx_memos,$tx_removals,$tx_sent,$tx_sent_to,$tx_spend_bundle,$tx_to_address,$tx_to_puzzle_hash,$tx_trade_id,$tx_wallet_id"
+			row="$tx_name,$tx_datetime,$tx_typedesc,$tx_amount,$current_price,$tx_additions,$tx_confirmed,$tx_confirmed_at_height,$tx_fee_amount,$tx_memos,$tx_removals,$tx_sent,$tx_sent_to,$tx_spend_bundle,$tx_to_address,$tx_to_puzzle_hash,$tx_trade_id,$tx_wallet_id"
 		else
-			row="$tx_name,$tx_datetime,$tx_typedesc,$tx_amount"
+			row="$tx_name,$tx_datetime,$tx_typedesc,$tx_amount,$current_price"
 		fi
 		echo "$row"
 	fi
