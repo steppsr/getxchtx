@@ -5,16 +5,25 @@ usage () {
   echo ""
   echo "OPTIONS"
   echo "  -y YEAR         transactions only for given 4-digit year      Default: all transactions"
+  echo "  -i INTERGER     Id of the wallet to use                       Default: 1"
+  echo "  -s INTERGER     Index of starting transaction                 Default: 0"
+  echo "  -e INTERGER     Index of ending transaction                   Default: 999999"
+  echo "  -o INTERGER     0 for ascending, 1 for descending             Default: 0"
+  echo "  -t INTERGER     -1 for all transaction types                  Default: -1"
+  echo "                    0 for INCOMING_TX"
+  echo "                    1 for OUTGOING_TX"
+  echo "                    2 for COINBASE_REWARD"
+  echo "                    3 for FEE_REWARD"
+  echo "                    4 for INCOMING_TRADE"
+  echo "                    5 for OUTGOING_TRADE"
   echo "  -v              verbose output"
   echo "  -h              help"
-  echo "  -i INTERGER     Id of the wallet to use                       Default: 1"
   echo ""
-  echo "  Example:    bash getxchtx.sh -y 2021 -v"
+  echo "  Example:"
+  echo "      bash getxchtx.sh -y 2021 -v"
   echo ""
-  echo ""
-  echo "Save to file with redirection"
-  echo ""
-  echo "   Example:   bash getxchtx.sh -y 2021 >tx_list.csv"
+  echo "  Example for saving to file:"
+  echo "      bash getxchtx.sh -y 2021 >tx_list.csv"
   echo ""
 }
 
@@ -40,35 +49,48 @@ mojo2xch () {
 }
 
 year="all"
-verbose=0
+verbose="false"
 wallet_id=1
+trx_start=0
+trx_end=999999
+trx_order=0
+desired_type=-1
 
 # Handle the command line options. Set variable based on input
+# be sure not to shift after an option that is only has one term
 while [ -n "$1" ]
 do
   case "$1" in
-    -h) usage & exit 1 ;;
-    -y) year=$2 & shift ;;
-    -v) verbose=1 & shift ;;
-    -i) wallet_id=$2 & shift ;;
-    --) shift & break ;;
+    -i) wallet_id=$2 && shift ;;
+    -y) year=$2 && shift ;;
+    -s) trx_start=$2 && shift ;;
+    -e) trx_end=$2 && shift ;;
+    -o) trx_order=$2 && shift ;;
+    -t) desired_type=$2 && shift ;;
+    -v) verbose="true" ;;
+    -h) usage && exit 1 ;;
+    --) shift && break ;;
     *)  ;;
   esac
 shift
 done
 
+# DEBUG
+# echo "WalletID=$wallet_id, Year=$year, Verbose=$verbose, Start=$trx_start, End=$trx_end, Sort=$trx_order, Desired Type = $desired_type"
+
 # Make a call against the chia wallet_rpc_api to get transactions, then use jq to write the json to a file
+query_parameters="{\"wallet_id\":$wallet_id,\"start\":$trx_start,\"end\":$trx_end,\"reverse\":$trx_order}"
 curl -s -X POST --insecure \
     --cert ~/.chia/mainnet/config/ssl/wallet/private_wallet.crt \
     --key ~/.chia/mainnet/config/ssl/wallet/private_wallet.key \
     -H "Accept: application/json" \
     -H "Content-Type: application/json" \
     "https://localhost:9256/get_transactions" \
-    -d '{"wallet_id":$wallet_id,"start":0,"end":999999,"reverse":0}' \
+    -d $query_parameters \
     | jq >alltxs.json
 
-# Write out a header row
-if [ "$verbose" == 1 ]; then
+# Write out a fileheader & header row
+if [ "$verbose" == "true" ]; then
     header="tx_name,tx_datetime,tx_type,tx_amount,current_price,tx_additions,tx_confirmed,tx_confirmed_at_height,tx_fee_amount,tx_memos,tx_removals,tx_sent,tx_sent_to,tx_spend_bundle,tx_to_address,tx_to_puzzle_hash,tx_trade_id,tx_wallet_id"
 else
     header="tx_name,tx_datetime,tx_type,tx_amount,current_price"
@@ -142,14 +164,18 @@ jq -c '.transactions[]' alltxs.json | while read trx; do
     # If year is passed in as an option we only want to print that year
     if [ "$year" == "all" ] || [ "$year" == "$tx_year" ]; then
 
-        # write out to screen
-        # to save to file the user must use redirection on the command line
-        if [ "$verbose" == 1 ]; then
-            row="$tx_name,$tx_datetime,$tx_typedesc,$tx_amount,$current_price,$tx_additions,$tx_confirmed,$tx_confirmed_at_height,$tx_fee_amount,$tx_memos,$tx_removals,$tx_sent,$tx_sent_to,$tx_spend_bundle,$tx_to_address,$tx_to_puzzle_hash,$tx_trade_id,$tx_wallet_id"
-        else
-            row="$tx_name,$tx_datetime,$tx_typedesc,$tx_amount,$current_price"
+        # If there was a desired type, lets limit the results down to only that transaction type
+        if [[ $desired_type -lt 0 ]] || [[ $desired_type -eq $tx_type ]]; then
+            
+            # write out to screen
+            # to save to file the user must use redirection on the command line
+            if [ "$verbose" == "true" ]; then
+                row="$tx_name,$tx_datetime,$tx_typedesc,$tx_amount,$current_price,$tx_additions,$tx_confirmed,$tx_confirmed_at_height,$tx_fee_amount,$tx_memos,$tx_removals,$tx_sent,$tx_sent_to,$tx_spend_bundle,$tx_to_address,$tx_to_puzzle_hash,$tx_trade_id,$tx_wallet_id"
+            else
+                row="$tx_name,$tx_datetime,$tx_typedesc,$tx_amount,$current_price"
+            fi
+            echo "$row"
         fi
-        echo "$row"
     fi
 done
 
@@ -173,9 +199,11 @@ done
 #         - Added command option for verbose which will include all fields in the CSV. The default is now
 #             a condensed version with fewer fields.
 #
+# v0.3 - New features:
+#         - Add a command option for sorting. Either ASC for ascending (oldest to newest) or DESC for 
+#             descending (newest to oldest).
+#         - Add a command option for selecting wallet id to pull transactions from.
+#         - Add a command option for start & end indexes for transactions to pull out of the wallet db.
+#         - Add a command option for selecting a specific Transaction Type to filter the list by.
 #
-# TODO
-# * Add a command option for selecting a specific Transaction Type to filter the list by.
-# * Add a command option for sorting. Either ASC for ascending (oldest to newest) or DESC for descending.
-# * Add a command option for selecting wallet id to pull transactions from.
-# * Add a command option for start & end indexes for transactions to pull out of the wallet db.
+
