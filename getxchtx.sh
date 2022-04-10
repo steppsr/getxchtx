@@ -120,7 +120,7 @@ jq -c '.transactions[]' alltxs.json | while read trx; do
 	if [ "$tx_typedesc" == "OUTGOING_TX" ]; then
 	
 		# pull all fields from removals into an array that we loop through to add up 
-		# amounts to remove (coins spent, change will come back in a separate transaction)
+		# amounts to remove (these are the coins spent, change will come back in a separate transaction)
 		newamount=0
 		IFS='^' read -r -a array <<< "$tx_removals"
 		for index in "${!array[@]}"
