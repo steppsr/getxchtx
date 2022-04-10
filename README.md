@@ -30,13 +30,13 @@ Save to file with redirection
 
 **1.** Since this is pulling historical transactions, the current price column is set to 0. You will need to populate that column manually. *Let me know if there is a free API that can pull historical pricing for XCH.*
 
-**2.** ***python3*** must be installed. Run the following command to see if you have it installed.
+**2.** ***curl*** must be installed. Run the following command to see if you have it installed.
 
 ```
-python3 --version
+curl --version
 ```
-**3.** ***xargs*** must be install. Run the following command to see if you have it installed.
+**3.** ***jq*** must be install. Run the following command to see if you have it installed.
 
 ```
-xargs --version
+jq --version
 ```
