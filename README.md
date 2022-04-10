@@ -41,12 +41,14 @@ OPTIONS
 
 **1.** Since this is pulling historical transactions, the current price column is set to 0. You will need to populate that column manually. *Let me know if there is a free API that can pull historical pricing for XCH.*
 
-**2.** ***curl*** must be installed. Run the following command to see if you have it installed.
+**Prerequisites**
+
+***curl*** must be installed. Run the following command to see if you have it installed.
 
 ```
 curl --version
 ```
-**3.** ***jq*** must be installed. Run the following command to see if you have it installed.
+***jq*** must be installed. Run the following command to see if you have it installed.
 
 ```
 jq --version
