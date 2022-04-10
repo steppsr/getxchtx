@@ -35,7 +35,7 @@ Save to file with redirection
 ```
 curl --version
 ```
-**3.** ***jq*** must be install. Run the following command to see if you have it installed.
+**3.** ***jq*** must be installed. Run the following command to see if you have it installed.
 
 ```
 jq --version
