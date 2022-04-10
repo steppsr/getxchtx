@@ -1,48 +1,37 @@
-# taxtran
+# getxchtx  (formerly taxtran)
 Generate a list of transactions for Chia (XCH) into a CSV file.
 
-There two scripts used when creating the CSV file with XCH transactions.
-
 ---
 
-**taxtran.sh** - this is the main script and the one that you will run from the command line. This script creates a list of all your transactions ids into a file by querying the wallet db, then loops through each transaction and calls the second script (chiatx.sh) with that transaction number. Note: the query actually pulls from 0 to 99999, so if you have more transactions than 99,999 you may need to edit the script prior to running.
+**getxchtx.sh** - you will run this script from the command line. This script pulls all your transactions into a json file by querying the wallet db, then loops through each transaction builds a CSV file. Note: the query actually pulls from 0 to 99999, so if you have more transactions than 99,999 you may need to edit the script prior to running.
 
-INPUT PARAMETERS: None<br>
-OUTPUT: CSV File named 'transactions.csv'
-
-```
-sh taxtran.sh
-```
 COMMAND OPTIONS<br>
 ```
-Usage: sh taxtran.sh [options]
+USAGE: bash getxchtx.sh [OPTIONS]
 
-options
-  -y        4-digit year for transactions     default = all
-  -d        directory to store output file    default = present working directory
-  -f        output filename                   default = transactions.csv
+OPTIONS
+  -y YEAR         transactions only for given 4-digit year      Default: all transactions
+  -v              verbose output
+  -h              help
 
-Example:  sh taxtran.sh -y 2021 -d ~/mytaxes -f transactions.csv
+  Example:    bash getxchtx.sh -y 2021 -v
+
+
+Save to file with redirection
+
+   Example:   bash getxchtx.sh -y 2021 >tx_list.csv
 ```
-
----
-
-**chiatx.sh** - this script will accept a transaction id as input, then run a Chia Wallet command to get the details of the transaction. The details are parsed and formatted then printed to a CSV file, and also to the screen. The screen output also includes a countdown counter on each line. *This script is called from taxtran.sh*
-
-INPUT PARAMETERS: Transaction ID, Counter (optional)<br>
-OUTPUT: transaction data appended to 'transaction.csv' and to screen.
 
 ---
 
 **Notes**<br>
 **1.** Since this is pulling historical transactions, the current price column is set to 0. You will need to populate that column manually. *Let me know if there is a free API that can pull historical pricing for XCH.*<br>
-**2.** Each transaction takes about 1 second to process, so it may take quite a while to finish creating the file.<br>
-**3.** ***python3*** must be installed. Run the following command to see if you have it installed.
+**2.** ***python3*** must be installed. Run the following command to see if you have it installed.
 
 ```
 python3 --version
 ```
-**4.** ***xargs*** must be install. Run the following command to see if you have it installed.
+**3.** ***xargs*** must be install. Run the following command to see if you have it installed.
 
 ```
 xargs --version
