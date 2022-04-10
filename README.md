@@ -13,15 +13,26 @@ USAGE: bash getxchtx.sh [OPTIONS]
 
 OPTIONS
   -y YEAR         transactions only for given 4-digit year      Default: all transactions
+  -i INTERGER     Id of the wallet to use                       Default: 1
+  -s INTERGER     Index of starting transaction                 Default: 0
+  -e INTERGER     Index of ending transaction                   Default: 999999
+  -o INTERGER     0 for ascending, 1 for descending             Default: 0
+  -t INTERGER     -1 for all transaction types                  Default: -1
+                    0 for INCOMING_TX
+                    1 for OUTGOING_TX
+                    2 for COINBASE_REWARD
+                    3 for FEE_REWARD
+                    4 for INCOMING_TRADE
+                    5 for OUTGOING_TRADE
   -v              verbose output
   -h              help
 
-  Example:    bash getxchtx.sh -y 2021 -v
+  Example:
+      bash getxchtx.sh -y 2021 -v
 
+  Example for saving to file:
+      bash getxchtx.sh -y 2021 >tx_list.csv
 
-Save to file with redirection
-
-   Example:   bash getxchtx.sh -y 2021 >tx_list.csv
 ```
 
 ---
