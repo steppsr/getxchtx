@@ -7,6 +7,7 @@ usage () {
   echo "  -y YEAR         transactions only for given 4-digit year      Default: all transactions"
   echo "  -v              verbose output"
   echo "  -h              help"
+  echo "  -i INTERGER     Id of the wallet to use                       Default: 1"
   echo ""
   echo "  Example:    bash getxchtx.sh -y 2021 -v"
   echo ""
@@ -40,6 +41,7 @@ mojo2xch () {
 
 year="all"
 verbose=0
+wallet_id=1
 
 # Handle the command line options. Set variable based on input
 while [ -n "$1" ]
@@ -48,6 +50,7 @@ do
     -h) usage & exit 1 ;;
     -y) year=$2 & shift ;;
     -v) verbose=1 & shift ;;
+    -i) wallet_id=$2 & shift ;;
     --) shift & break ;;
     *)  ;;
   esac
@@ -61,7 +64,7 @@ curl -s -X POST --insecure \
     -H "Accept: application/json" \
     -H "Content-Type: application/json" \
     "https://localhost:9256/get_transactions" \
-    -d '{"wallet_id":1,"start":0,"end":999999,"reverse":0}' \
+    -d '{"wallet_id":$wallet_id,"start":0,"end":999999,"reverse":0}' \
     | jq >alltxs.json
 
 # Write out a header row
@@ -170,3 +173,9 @@ done
 #         - Added command option for verbose which will include all fields in the CSV. The default is now
 #             a condensed version with fewer fields.
 #
+#
+# TODO
+# * Add a command option for selecting a specific Transaction Type to filter the list by.
+# * Add a command option for sorting. Either ASC for ascending (oldest to newest) or DESC for descending.
+# * Add a command option for selecting wallet id to pull transactions from.
+# * Add a command option for start & end indexes for transactions to pull out of the wallet db.
