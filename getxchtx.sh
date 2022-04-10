@@ -149,3 +149,24 @@ jq -c '.transactions[]' alltxs.json | while read trx; do
         echo "$row"
     fi
 done
+
+# Version History
+#
+# v0.1 - Initial Release:
+#         - Basic functionality. Will generate a list of transactions for Chia (XCH) and
+#             put into a CSV file. Pulls only a list of transaction ids from wallet then looped on those
+#             ids and used Chia commands to get more details for each transaction.
+#         - Output was sent to the screen and also saved to a file. This required defaults for path & 
+#             filenames and also command options from user to specify each as well.
+# 
+# v0.2 - Changes:
+#         - Rebuilt the query against the wallet db to pull all the transaction data and write into a
+#             json file that can be used in the rest of the script without having to run Chia commands.
+#         - Changed output to screen only and updated Usage to tell user how to redirect to a file from
+#             the command line. 
+#        New features:
+#         - Added command option to specify a year for the transactions. If the transacion year doesn't 
+#             match the value from the command option, then it doesn't get writtent to the CSV.
+#         - Added command option for verbose which will include all fields in the CSV. The default is now
+#             a condensed version with fewer fields.
+#
