@@ -5,7 +5,7 @@ Generate a list of transactions for Chia (XCH) into a CSV file.
 
 ---
 
-**getxchtx.sh** - You must run this script from the command line. The script pulls all your transactions into a json file by querying the wallet db, then loops through each transaction building a CSV file. _Note_: the query actually pulls from 0 to 999999, so if you have more transactions than 999,999 you may need to edit the script prior to running. Also, you must use the '**bash**' command and _not_ '**sh**'.
+**getxchtx.sh** - You must run this script from the command line. The script pulls all your transactions into a json file by querying the wallet db, then loops through each transaction building a CSV file. Note: You must use the '**bash**' command and _not_ '**sh**'.
 
 COMMAND OPTIONS<br>
 ```
@@ -17,6 +17,8 @@ OPTIONS
   -s INTERGER     Index of starting transaction                 Default: 0
   -e INTERGER     Index of ending transaction                   Default: 999999
   -o INTERGER     0 for ascending, 1 for descending             Default: 0
+  -min AMOUNT     Only transactions greater than AMOUNT         Default: 0
+  -max AMOUNT     Only transactions less than AMOUNT            Default: 999999
   -t INTERGER     -1 for all transaction types                  Default: -1
                     0 for INCOMING_TX
                     1 for OUTGOING_TX
