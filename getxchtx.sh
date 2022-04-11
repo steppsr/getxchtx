@@ -218,6 +218,6 @@ done
 #            - Add a command option for selecting a specific Transaction Type to filter the list by.
 #
 # v0.3.1 - Changes
-#            - Rewrite so filters are in a big nested if statement. Use continue to jump to next iteration instead.
+#            - Rewrite so filters are not in a big nested if statement. Use continue to jump to next iteration instead.
 #          New features:
 #            - Add a command option for filtering based on transaction amount.
