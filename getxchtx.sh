@@ -9,6 +9,8 @@ usage () {
   echo "  -s INTERGER     Index of starting transaction                 Default: 0"
   echo "  -e INTERGER     Index of ending transaction                   Default: 999999"
   echo "  -o INTERGER     0 for ascending, 1 for descending             Default: 0"
+  echo "  -min AMOUNT     Only transactions greater than AMOUNT         Default: 0"
+  echo "  -max AMOUNT     Only transactions less than AMOUNT            Default: 999999"
   echo "  -t INTERGER     -1 for all transaction types                  Default: -1"
   echo "                    0 for INCOMING_TX"
   echo "                    1 for OUTGOING_TX"
@@ -55,6 +57,8 @@ trx_start=0
 trx_end=999999
 trx_order=0
 desired_type=-1
+trx_max=999999
+trx_min=0
 
 # Handle the command line options. Set variable based on input
 # be sure not to shift after an option that is only has one term
@@ -67,6 +71,8 @@ do
     -e) trx_end=$2 && shift ;;
     -o) trx_order=$2 && shift ;;
     -t) desired_type=$2 && shift ;;
+    -min) trx_min=$2 && shift ;;
+    -max) trx_max=$2 && shift ;;
     -v) verbose="true" ;;
     -h) usage && exit 1 ;;
     --) shift && break ;;
@@ -74,9 +80,6 @@ do
   esac
 shift
 done
-
-# DEBUG
-# echo "WalletID=$wallet_id, Year=$year, Verbose=$verbose, Start=$trx_start, End=$trx_end, Sort=$trx_order, Desired Type = $desired_type"
 
 # Make a call against the chia wallet_rpc_api to get transactions, then use jq to write the json to a file
 query_parameters="{\"wallet_id\":$wallet_id,\"start\":$trx_start,\"end\":$trx_end,\"reverse\":$trx_order}"
@@ -120,15 +123,30 @@ jq -c '.transactions[]' alltxs.json | while read trx; do
     tx_type=`echo "$trx" | jq -r '.type'`
     tx_wallet_id=`echo "$trx" | jq -r '.wallet_id'`
 
+    # If there was a desired type, lets limit the results down to only that transaction type
+    if [[ $desired_type -ge 0 ]] && [[ $desired_type -ne $tx_type ]]; then
+        continue
+    fi
+
     # placeholder for the current price of XCH
     current_price=0
 
     # call function to switch amount from mojo to xch
     mojo2xch && tx_amount=$xch
 
+    # filter based on min/max
+    if [[ "$tx_amount" > "$trx_max" ]] || [[ "$tx_amount" < "$trx_min" ]]; then
+        continue
+    fi
+    
     # build datetime from epoch
     tx_datetime=$(date --date=@$tx_created_at_time +"%Y-%m-%d %T")
     tx_year=`echo $tx_datetime | cut -c1-4`
+
+    # jump to next record if we want a specific year and the transaction doesn't match
+    if [ "$year" != "all" ] && [ "$year" != "$tx_year" ]; then
+        continue
+    fi
 
     # set a good description for the transaction type
     case $tx_type in
@@ -161,49 +179,45 @@ jq -c '.transactions[]' alltxs.json | while read trx; do
         mojo2xch && tx_amount=$xch
     fi
 
-    # If year is passed in as an option we only want to print that year
-    if [ "$year" == "all" ] || [ "$year" == "$tx_year" ]; then
-
-        # If there was a desired type, lets limit the results down to only that transaction type
-        if [[ $desired_type -lt 0 ]] || [[ $desired_type -eq $tx_type ]]; then
-            
-            # write out to screen
-            # to save to file the user must use redirection on the command line
-            if [ "$verbose" == "true" ]; then
-                row="$tx_name,$tx_datetime,$tx_typedesc,$tx_amount,$current_price,$tx_additions,$tx_confirmed,$tx_confirmed_at_height,$tx_fee_amount,$tx_memos,$tx_removals,$tx_sent,$tx_sent_to,$tx_spend_bundle,$tx_to_address,$tx_to_puzzle_hash,$tx_trade_id,$tx_wallet_id"
-            else
-                row="$tx_name,$tx_datetime,$tx_typedesc,$tx_amount,$current_price"
-            fi
-            echo "$row"
-        fi
+    # write out to screen
+    # to save to file the user must use redirection on the command line
+    if [ "$verbose" == "true" ]; then
+        row="$tx_name,$tx_datetime,$tx_typedesc,$tx_amount,$current_price,$tx_additions,$tx_confirmed,$tx_confirmed_at_height,$tx_fee_amount,$tx_memos,$tx_removals,$tx_sent,$tx_sent_to,$tx_spend_bundle,$tx_to_address,$tx_to_puzzle_hash,$tx_trade_id,$tx_wallet_id"
+    else
+        row="$tx_name,$tx_datetime,$tx_typedesc,$tx_amount,$current_price"
     fi
+    echo "$row"
+
 done
 
 # Version History
 #
-# v0.1 - Initial Release:
-#         - Basic functionality. Will generate a list of transactions for Chia (XCH) and
-#             put into a CSV file. Pulls only a list of transaction ids from wallet then looped on those
-#             ids and used Chia commands to get more details for each transaction.
-#         - Output was sent to the screen and also saved to a file. This required defaults for path & 
-#             filenames and also command options from user to specify each as well.
+# v0.1.0 - Initial Release:
+#            - Basic functionality. Will generate a list of transactions for Chia (XCH) and
+#                put into a CSV file. Pulls only a list of transaction ids from wallet then looped on those
+#                ids and used Chia commands to get more details for each transaction.
+#            - Output was sent to the screen and also saved to a file. This required defaults for path & 
+#                filenames and also command options from user to specify each as well.
 # 
-# v0.2 - Changes:
-#         - Rebuilt the query against the wallet db to pull all the transaction data and write into a
-#             json file that can be used in the rest of the script without having to run Chia commands.
-#         - Changed output to screen only and updated Usage to tell user how to redirect to a file from
-#             the command line. 
-#        New features:
-#         - Added command option to specify a year for the transactions. If the transacion year doesn't 
-#             match the value from the command option, then it doesn't get writtent to the CSV.
-#         - Added command option for verbose which will include all fields in the CSV. The default is now
-#             a condensed version with fewer fields.
+# v0.2.0 - Changes:
+#            - Rebuilt the query against the wallet db to pull all the transaction data and write into a
+#                json file that can be used in the rest of the script without having to run Chia commands.
+#            - Changed output to screen only and updated Usage to tell user how to redirect to a file from
+#               the command line. 
+#          New features:
+#            - Added command option to specify a year for the transactions. If the transacion year doesn't 
+#                match the value from the command option, then it doesn't get writtent to the CSV.
+#            - Added command option for verbose which will include all fields in the CSV. The default is now
+#               a condensed version with fewer fields.
 #
-# v0.3 - New features:
-#         - Add a command option for sorting. Either ASC for ascending (oldest to newest) or DESC for 
-#             descending (newest to oldest).
-#         - Add a command option for selecting wallet id to pull transactions from.
-#         - Add a command option for start & end indexes for transactions to pull out of the wallet db.
-#         - Add a command option for selecting a specific Transaction Type to filter the list by.
+# v0.3.0 - New features:
+#            - Add a command option for sorting. Either ASC for ascending (oldest to newest) or DESC for 
+#                descending (newest to oldest).
+#            - Add a command option for selecting wallet id to pull transactions from.
+#            - Add a command option for start & end indexes for transactions to pull out of the wallet db.
+#            - Add a command option for selecting a specific Transaction Type to filter the list by.
 #
-
+# v0.3.1 - Changes
+#            - Rewrite so filters are in a big nested if statement. Use continue to jump to next iteration instead.
+#          New features:
+#            - Add a command option for filtering based on transaction amount.
