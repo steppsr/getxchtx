@@ -1,5 +1,4 @@
 # XCH Transaction Exporter : getxchtx  
-(_formerly taxtran_)
 
 Generate a list of transactions for Chia (XCH) into a CSV file.
 
