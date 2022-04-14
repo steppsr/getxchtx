@@ -56,3 +56,5 @@ curl --version
 ```
 jq --version
 ```
+
+Disclaimer: For educational purposes only.
