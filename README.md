@@ -32,7 +32,7 @@ OPTIONS
       bash getxchtx.sh -y 2021 -v
 
   Example for saving to file:
-      bash getxchtx.sh -y 2021 >tx_list.csv
+      bash getxchtx.sh -y 2021 > tx_list.csv
 
 ```
 

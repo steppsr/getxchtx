@@ -25,7 +25,7 @@ usage () {
   echo "      bash getxchtx.sh -y 2021 -v"
   echo ""
   echo "  Example for saving to file:"
-  echo "      bash getxchtx.sh -y 2021 >tx_list.csv"
+  echo "      bash getxchtx.sh -y 2021 > tx_list.csv"
   echo ""
 }
 
