@@ -25,6 +25,7 @@ OPTIONS
                     3 for FEE_REWARD
                     4 for INCOMING_TRADE
                     5 for OUTGOING_TRADE
+  -b              basic output (fewer fields)
   -v              verbose output
   -h              help
 
