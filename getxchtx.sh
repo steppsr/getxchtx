@@ -18,6 +18,7 @@ usage () {
   echo "                    3 for FEE_REWARD"
   echo "                    4 for INCOMING_TRADE"
   echo "                    5 for OUTGOING_TRADE"
+  echo "  -b              basic output (fewer fields)"
   echo "  -v              verbose output"
   echo "  -h              help"
   echo ""
@@ -25,7 +26,7 @@ usage () {
   echo "      bash getxchtx.sh -y 2021 -v"
   echo ""
   echo "  Example for saving to file:"
-  echo "      bash getxchtx.sh -y 2021 > tx_list.csv"
+  echo "      bash getxchtx.sh -y 2021 >tx_list.csv"
   echo ""
 }
 
@@ -52,6 +53,7 @@ mojo2xch () {
 
 year="all"
 verbose="false"
+basic="false"
 wallet_id=1
 trx_start=0
 trx_end=999999
@@ -73,6 +75,7 @@ do
     -t) desired_type=$2 && shift ;;
     -min) trx_min=$2 && shift ;;
     -max) trx_max=$2 && shift ;;
+    -b) basic="true" ;;
     -v) verbose="true" ;;
     -h) usage && exit 1 ;;
     --) shift && break ;;
@@ -90,7 +93,7 @@ curl -s -X POST --insecure \
     -H "Content-Type: application/json" \
     "https://localhost:9256/get_transactions" \
     -d $query_parameters \
-    | jq >alltxs.json
+    | jq . >alltxs.json
 
 # Write out a fileheader & header row
 if [ "$verbose" == "true" ]; then
@@ -184,7 +187,11 @@ jq -c '.transactions[]' alltxs.json | while read trx; do
     if [ "$verbose" == "true" ]; then
         row="$tx_name,$tx_datetime,$tx_typedesc,$tx_amount,$current_price,$tx_additions,$tx_confirmed,$tx_confirmed_at_height,$tx_fee_amount,$tx_memos,$tx_removals,$tx_sent,$tx_sent_to,$tx_spend_bundle,$tx_to_address,$tx_to_puzzle_hash,$tx_trade_id,$tx_wallet_id"
     else
-        row="$tx_name,$tx_datetime,$tx_typedesc,$tx_amount,$current_price"
+        if [ "$basic" == "true" ]; then
+            row="$tx_datetime,$tx_typedesc,$tx_amount"
+        else
+            row="$tx_name,$tx_datetime,$tx_typedesc,$tx_amount,$current_price"
+        fi
     fi
     echo "$row"
 
@@ -221,3 +228,10 @@ done
 #            - Rewrite so filters are not in a big nested if statement. Use continue to jump to next iteration instead.
 #          New features:
 #            - Add a command option for filtering based on transaction amount.
+#
+# v0.3.2 - Changes
+#            - Added filter to jq when building the all transactions file to keep older versions of jq from
+#                having issues.
+#          New features:
+#            - Add a command option called 'basic' for displaying even fewer fields in the result.
+
